@@ -24,7 +24,6 @@ Sentry.init({
   sendDefaultPii: true,
   integrations: [
     Sentry.browserTracingIntegration(),
-    // todo: explain this in detail once we get there
     Sentry.replayIntegration({
       maskAllText: false,
       maskAllInputs: false,
