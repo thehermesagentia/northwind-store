@@ -8,6 +8,7 @@ import { useState } from "react";
 export default function useCartPage() {
   const { getToken } = useAuth();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
 
   const items = useCart((s) => s.items);
   const setQty = useCart((s) => s.setQty);
@@ -37,23 +38,30 @@ export default function useCartPage() {
 
   async function checkout() {
     setCheckoutLoading(true);
+    setCheckoutError(null);
 
     const body = {
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     };
 
-    const res = await apiFetch("/api/checkout", {
-      getToken,
-      method: "POST",
-      body,
-    });
+    try {
+      const res = await apiFetch("/api/checkout", {
+        getToken,
+        method: "POST",
+        body,
+      });
 
-    if (res?.checkoutUrl) {
-      window.location.href = res.checkoutUrl;
-      return;
+      if (res?.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+
+      setCheckoutError("No checkout URL received. Please try again.");
+    } catch (e) {
+      setCheckoutError(e?.message || "Checkout failed. Please try again.");
+    } finally {
+      setCheckoutLoading(false);
     }
-
-    setCheckoutLoading(false);
   }
 
   return {
@@ -66,5 +74,6 @@ export default function useCartPage() {
     subtotal,
     checkout,
     checkoutLoading,
+    checkoutError,
   };
 }

@@ -19,6 +19,7 @@ function CartPage() {
   const {
     checkout,
     checkoutLoading,
+    checkoutError,
     items,
     lines,
     productsError,
@@ -133,6 +134,11 @@ function CartPage() {
             </div>
 
             <Show when="signed-in">
+              {checkoutError && (
+                <div className="alert alert-error mt-4 text-sm">
+                  <span>{checkoutError}</span>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={checkout}
